@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İzleVeSohbet</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-5">İzleVeSohbet</h1>
+        <form id="usernameForm">
+            <div class="form-group">
+                <label for="username">Kullanıcı Adı:</label>
+                <input type="text" id="username" class="form-control" placeholder="Kullanıcı adınızı girin" required>
+            </div>
+            <div class="form-group">
+                <label for="roomName">Oda Adı:</label>
+                <input type="text" id="roomName" class="form-control" placeholder="Oda adını girin" required>
+            </div>
+            <button type="button" id="createRoomButton" class="btn btn-secondary">Oda Kur</button>
+            <button type="button" id="joinRoomButton" class="btn btn-secondary">Odaya Katıl</button>
+        </form>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>/*lahmacun*/
+        document.getElementById('createRoomButton').addEventListener('click', function() {
+            const username = document.getElementById('username').value;
+            const roomName = document.getElementById('roomName').value;
+            if (username && roomName) {
+                window.location.href = `room.html?username=${username}&room=${roomName}`;
+            }
+        });
+/*lahmacun*/
+        document.getElementById('joinRoomButton').addEventListener('click', function() {
+            const username = document.getElementById('username').value;
+            const roomName = document.getElementById('roomName').value;
+            if (username && roomName) {
+                window.location.href = `room.html?username=${username}&room=${roomName}`;
+            }
+        });/*lahmacun*/
+    </script>
+</body>
+</html>

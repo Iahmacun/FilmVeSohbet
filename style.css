@@ -1,0 +1,153 @@
+
+body {
+    background-color: #141414; 
+    font-family: 'Arial', sans-serif;
+    color: #fff;
+    margin: 0; 
+}
+
+.video-container {
+    background-color: var(--secondary-color);
+    padding: 20px;
+    border-radius: 8px;
+    height: 100vh;
+}
+
+.video-content {
+    text-align: center; 
+}
+
+.video-content h2 {
+    color: var(--primary-color);
+}
+
+.video-overlay {
+    background-color: rgba(0, 0, 0, 0.7); 
+}
+.chat {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(135deg, #222, #141414); 
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3)
+}
+
+.chat-header {
+    padding: 10px;
+    border-bottom: 1px solid #363434;
+}
+
+.chat-title {
+    margin-bottom: 0;
+    font-size: 1.5rem;
+}
+
+.chat-messages {  
+flex: 1;
+    padding: 10px;
+    max-height: 650px; 
+        overflow-y: scroll;
+        max-height: 150;
+    
+}
+
+.chat-form {
+    padding: 10px;
+    border-top: 1px solid #4b4949;
+}
+
+.chat-form .input-group {
+    width: 100%;
+}
+
+.chat-form .input-group-append {
+    width: auto;
+}
+
+.chat-form input[type="text"] {
+    border-radius: 0;
+}
+
+.chat-form button[type="submit"] {
+    border-radius: 4;
+    
+}
+
+#leaveRoomButton {
+    width: 100%;
+}
+
+
+@media (max-width: 768px) { 
+    .chat-container {
+        width: 100%; 
+        height: 40%; 
+        bottom: 0; 
+        right: 0;
+    }
+}
+
+:root {
+  --primary-color: #e50914; 
+  --secondary-color: #333;  
+  --text-color: #000000;       
+}
+
+
+.btn-primary {
+    background-color: #474545; 
+    border-color: #535151; 
+    color: #ffffff;
+    border-radius: 4px
+}
+
+.btn-primary:hover {
+    background-color: #495057;
+    border-color: #495057; 
+}
+
+
+.chat-form {
+    background: linear-gradient(135deg, #222, #141414); 
+}
+
+.chat-messages .list-group-item {
+    background-color: #3a3a3a; 
+}
+.chat-messages::-webkit-scrollbar {
+    
+    display: none;
+}
+
+
+
+ul#messages {
+    list-style-type: none;
+    padding: 0;
+    max-height: 600px; 
+    overflow-y: auto; 
+}
+ul#messages::-webkit-scrollbar {
+    
+    display: none;
+}
+    
+
+
+ul#messages li {
+    margin-bottom: 10px; 
+    word-wrap: break-word; 
+}
+ul#messages li::-webkit-scrollbar {
+    
+        display: none;
+}
+.chat-form {
+    margin-top: 10px;
+}
+
+
+.chat-form {
+    margin-top: 10px; 
+}
+/*lahmacun*/

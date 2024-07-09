@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İzleVeSohbet - Oda</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-9 video-container">
+                <div class="video-content">
+                    <h2>FİLM DİZİ İZLEME PLATFORMU</h2>
+                    <input type="text" id="videoUrlInput" class="form-control" placeholder="Video URL'sini buraya yapıştırın">
+                    <button id="loadVideoButton" class="btn btn-secondary mt-2">Videoyu Yükle</button>
+                    <input type="file" id="fileInput" class="form-control-file mt-2" accept="video/*" style="display: none;">
+                    <label for="fileInput" id="fileInputLabel" class="btn btn-secondary mt-2" style="cursor: pointer;">📁 Dosya Seç</label>
+                    <button id="uploadFileButton" class="btn btn-secondary mt-2" style="display: none;">📁 Dosyayı Yükle</button>
+                    <video id="videoPlayer" controls width="100%" height="auto"></video>
+                </div>
+            </div>
+            <div class="col-lg-3 chat-container" id="chatContainer">
+                <div class="chat">
+                    <div class="chat-header">
+                        <h2 class="chat-title">
+                            CHAT 
+                            <button id="toggleChatButton" class="btn btn-link"><i class="fas fa-chevron-up"></i></button>
+                        </h2>
+                    </div>
+                    <div id="chatMessages" class="chat-messages">
+                        <ul id="messages" class="list-group"></ul>
+                    </div>
+                    <div id="usernames" class="chat-usernames"></div>
+                    <form id="form" class="chat-form">
+                        <div class="input-group">
+                            <input id="input" autocomplete="off" class="form-control" placeholder="Mesajınızı buraya yazın...">
+                            <div class="input-group-append">
+                                <button type="submit" class="btn btn-secondary">Gönder</button> 
+                            </div>
+                        </div>
+                    </form>
+                    <button id="leaveRoomButton" class="btn btn-danger mt-3">Odayı Terk Et</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        const socket = io({
+            query: {
+                username: new URLSearchParams(window.location.search).get('username'),
+                room: new URLSearchParams(window.location.search).get('room')
+            }
+        });
+
+        const username = new URLSearchParams(window.location.search).get('username');
+        const room = new URLSearchParams(window.location.search).get('room');
+
+       
+        socket.emit('join room', { username, room });
+
+        
+        document.getElementById('fileInput').addEventListener('change', function() {
+            const fileInput = document.getElementById('fileInput');
+            const fileInputLabel = document.getElementById('fileInputLabel');
+            const uploadFileButton = document.getElementById('uploadFileButton');
+            if (fileInput.files.length > 0) {
+                uploadFileButton.style.display = 'inline-block';
+                fileInputLabel.style.display = 'none';
+            } else {
+                uploadFileButton.style.display = 'none';
+                fileInputLabel.style.display = 'inline-block';
+            }
+        });
+
+        
+        document.getElementById('form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const input = document.getElementById('input');
+            if (input.value) {
+                socket.emit('chat message', { username, room, message: input.value });
+                input.value = '';
+            }
+        });
+
+        
+        socket.on('chat message', function(msg) {
+            addMessage(msg.username, msg.message);
+            scrollToBottom();
+        });
+
+        
+        socket.on('user joined', function(msg) {
+            addInfoMessage(msg);
+            scrollToBottom();
+        });
+
+        
+        document.getElementById('loadVideoButton').addEventListener('click', function() {
+            const videoUrl = document.getElementById('videoUrlInput').value;
+            socket.emit('load video', { username, room, videoUrl });
+            socket.emit('chat message', { username: 'Sistem', room, message: `${username} video ekledi.` });
+        });
+
+        
+        document.getElementById('uploadFileButton').addEventListener('click', function() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const videoUrl = e.target.result;
+                    socket.emit('load video', { username, room, videoUrl });
+                    socket.emit('chat message', { username: 'Sistem', room, message: `${username} dosya ekledi.` });
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+       
+        socket.on('load video', function(data) {
+            const videoPlayer = document.getElementById('videoPlayer');
+            videoPlayer.src = data.videoUrl;
+            videoPlayer.play();
+        });
+
+        
+        document.getElementById('videoPlayer').addEventListener('play', function() {
+            socket.emit('video play', { username, room });
+        });
+
+        
+        socket.on('video play', function() {
+            const videoPlayer = document.getElementById('videoPlayer');
+            if (videoPlayer.paused) {
+                videoPlayer.play();
+            }
+        });
+
+        
+        document.getElementById('videoPlayer').addEventListener('pause', function() {
+            socket.emit('video pause', { username, room });
+        });
+
+        socket.on('video pause', function() {
+            const videoPlayer = document.getElementById('videoPlayer');
+            if (!videoPlayer.paused) {
+                videoPlayer.pause();
+            }
+        });
+
+        document.getElementById('videoPlayer').addEventListener('seeked', function() {
+            const videoPlayer = document.getElementById('videoPlayer');
+            socket.emit('video seek', { username, room, time: videoPlayer.currentTime });
+        });
+
+        socket.on('video seek', function(data) {
+            const videoPlayer = document.getElementById('videoPlayer');
+            if (Math.abs(videoPlayer.currentTime - data.time) > 1) {
+                videoPlayer.currentTime = data.time;
+            }
+        });
+
+        socket.on('room created', function(msg) {
+            socket.emit('chat message', { username: 'Sistem', room, message: ` oda kurdu.` });
+        });
+
+        socket.on('usernames', function(usernames) {
+            const usernamesContainer = document.getElementById('usernames');
+            usernamesContainer.innerHTML = '';
+            usernames.forEach(user => {
+                const userElement = document.createElement('div');
+                userElement.textContent = user;
+                usernamesContainer.appendChild(userElement);
+            });
+        });
+
+        document.getElementById('leaveRoomButton').addEventListener('click', function() {
+            socket.emit('leave room', { username, room });
+            socket.emit('chat message', { username: 'Sistem', room, message: `🚪odadan çıkış yaptı.` });
+            window.location.href = '/'; 
+        });
+
+        function addMessage(username, message) {
+            const messages = document.getElementById('messages');
+            const item = document.createElement('li');
+            item.classList.add('list-group-item');
+            item.innerHTML = `<strong>${username}</strong>: ${message}`;
+            messages.appendChild(item);
+        }
+
+        function addInfoMessage(message) {
+            const messages = document.getElementById('messages');
+            const item = document.createElement('li');
+            item.classList.add('list-group-item', 'text-center', 'text-muted');
+            item.textContent = message;
+            messages.appendChild(item);
+        }
+
+        function scrollToBottom() {
+    const chatMessages = document.getElementById('chatMessages');
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+    </script>
+</body>
+</html>
