@@ -12,4 +12,5 @@ FilmVeSohbet, film izleme ve sohbet platformu için bir web uygulamasıdır. Kul
 
 Projeyi yerel bilgisayarınıza klonlayın:
 
-```bash git clone https://github.com/Iahmacun/FilmVeSohbet.git
+  ```bash
+git clone https://github.com/Iahmacun/FilmVeSohbet.git
